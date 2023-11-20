@@ -32,8 +32,8 @@ INPUT = dict(
 )
 
 SOLVER = dict(
-    IMS_PER_BATCH=48,
-    TOTAL_EPOCHS=40,  # 10
+    IMS_PER_BATCH=8,
+    TOTAL_EPOCHS=20,  # 10
     LR_SCHEDULER_NAME="flat_and_anneal",
     ANNEAL_METHOD="cosine",  # "cosine"
     ANNEAL_POINT=0.72,
@@ -75,7 +75,7 @@ MODEL = dict(
             FREEZE=False,
             PRETRAINED="timm",
             INIT_CFG=dict(
-                type="timm/convnext_base",
+                type="timm/convnext_tiny",
                 pretrained=True,
                 in_chans=3,
                 features_only=True,
@@ -87,7 +87,7 @@ MODEL = dict(
             FREEZE=False,
             INIT_CFG=dict(
                 type="TopDownDoubleMaskXyzRegionHead",
-                in_dim=1024,  # this is num out channels of backbone conv feature
+                in_dim=768,  # this is num out channels of backbone conv feature
             ),
             NUM_REGIONS=64,
             XYZ_CLASS_AWARE=True,
