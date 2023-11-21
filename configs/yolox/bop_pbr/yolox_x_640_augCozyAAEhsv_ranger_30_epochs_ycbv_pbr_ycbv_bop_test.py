@@ -83,7 +83,7 @@ train.checkpointer = dict(period=2, max_to_keep=10)
 test.test_dataset_names = DATASETS.TEST
 test.augment = True
 test.scales = (1, 0.75, 0.83, 1.12, 1.25)
-test.conf_thr = 0.001
+test.conf_thr = 0.5
 
 dataloader.test = [
     L(build_yolox_test_loader)(

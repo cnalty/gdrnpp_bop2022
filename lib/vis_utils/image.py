@@ -105,8 +105,8 @@ def vis_image_mask_cv2(img, mask, color=None):
     else:
         color_mask = np.array(color_val(color), dtype=np.uint8)
         # print(color_mask, type(color_mask))
-    mask = mask.astype(np.bool)
-    img_show = img.copy()
+    mask = mask.astype(bool)
+    img_show = img#.copy()
     img_show[mask] = img_show[mask] * 0.5 + color_mask * 0.5
     return img_show
 
@@ -118,10 +118,10 @@ def vis_image_mask_bbox_cv2(
     bboxes: xyxy
     """
     text_color = color_val(text_color)
-    img_show = img.copy()
+    img_show = img#.copy()
     for i, mask in enumerate(masks):
         color_mask = np.random.randint(0, 256, (1, 3), dtype=np.uint8)
-        mask = mask.astype(np.bool)
+        mask = mask.astype(bool)
         img_show[mask] = img_show[mask] * 0.5 + color_mask * 0.5
         if bboxes is None:
             x1, y1, x2, y2 = mask2bbox_xyxy(mask)
@@ -162,7 +162,7 @@ def vis_image_bboxes_cv2(
     text_color = color_val(text_color)
     box_color = tuple(int(_c) for _c in color_val(box_color))
 
-    img_show = img.copy()
+    img_show = img#.copy()
     for i, bbox in enumerate(bboxes):
         bbox = bbox.astype(np.int32)
         x1, y1, x2, y2 = bbox[:4]
