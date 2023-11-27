@@ -173,14 +173,16 @@ class YoloPredictor():
 if __name__ == "__main__":
     predictor = YoloPredictor(
                        exp_name="yolox-x",
-                        config_file_path=osp.join(PROJ_ROOT, "configs/yolox/bop_pbr/yolox_x_640_augCozyAAEhsv_ranger_30_epochs_ycbv_pbr_ycbv_bop_test.py"),
+                        config_file_path=osp.join(PROJ_ROOT, "configs/yolox/custom/yolox_x_640_augCozyAAEhsv_ranger_30_epochs_custom_test.py"),
                         ckpt_file_path=osp.join(PROJ_ROOT, "pretrained_models/yolox/ycbv_pbr/model_final.pth"),
                        fuse=True,
                        fp16=False
                        )
     for i in range(1,11):
-        img_path = osp.join(PROJ_ROOT,"datasets/BOP_DATASETS/ycbv/test/000048/rgb/{:06d}.png".format(i))
+        img_path = osp.join(PROJ_ROOT,"/mnt/sdc1/3d_datasets/test_clips/ycb_objects/rgb/{:07d}.png".format(i))
         img = cv2.imread(img_path)
+        print(img.shape)
+        img = cv2.resize(img, (640, 480))
         result = predictor.inference(img)
         class_names = {1: 'Master Chef Can',
                          2: 'Cracker Box',

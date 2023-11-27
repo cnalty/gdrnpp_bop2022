@@ -179,9 +179,9 @@ class GdrnPredictor():
         data_dict["cur_res"] = []
         for i_inst in range(len(data_dict["roi_img"])):
             i_out += 1
-            print(data_dict['roi_cls'][i_out])
+            #print(data_dict['roi_cls'][i_out])
             cur_obj_id = self.obj_ids[int(data_dict["roi_cls"][i_out])]
-            print(cur_obj_id)
+            #print(cur_obj_id)
             cur_res = {
                 "obj_id": cur_obj_id,
                 "score": float(data_dict["score"][i_inst]),
@@ -350,7 +350,7 @@ class GdrnPredictor():
 
             dataset_dict["annotations"].append(annot_inst)
 
-        im_H_ori, im_W_ori = image.shape[:2]
+        im_H_ori, im_W_ori = image.shape[:2] # (720, 1280)
 
         # other transforms (mainly geometric ones);
         # for 6d pose task, flip is not allowed in general except for some 2d keypoints methods
@@ -632,13 +632,15 @@ class GdrnPredictor():
             )
 
             vis_dict[f"im_det_and_mask_full"] = img_vis_full_mask[:, :, ::-1]
-
+        image_mask_pose_est = image
         for i in range(bs):
             R = batch["cur_res"][i]["R"]
             t = batch["cur_res"][i]["t"]
             # pose_est = np.hstack([R, t.reshape(3, 1)])
             curr_class = batch['roi_cls'][i].detach().cpu().item()
-            print(curr_class)
+            if curr_class not in [3, 17]:
+                continue
+            #print(curr_class)
             proj_pts_est = misc.project_pts(self.obj_models[curr_class + 1]["pts"], self.cam, R, t)
             mask_pose_est = misc.points2d_to_mask(proj_pts_est, im_H, im_W)
             image_mask_pose_est = vis_image_mask_cv2(image, mask_pose_est, color="yellow" if i == 0 else "blue")
