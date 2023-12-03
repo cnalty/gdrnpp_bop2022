@@ -113,7 +113,7 @@ class CUSTOM_TRAIN_ISAAC_Dataset:
             gt_info_dict = mmcv.load(osp.join(scene_root, "scene_gt_info.json"))
             cam_dict = mmcv.load(osp.join(scene_root, "scene_camera.json"))
             print(f'gt_dict size: {len(gt_dict)}')
-            for str_im_id in tqdm(gt_dict, postfix=f"{scene_id}"):
+            for str_im_id in tqdm(gt_info_dict, postfix=f"{scene_id}"):
                 int_im_id = int(str_im_id)
                 rgb_path = osp.join(scene_root, "rgb/{:04d}.jpg").format(int_im_id)
                 assert osp.exists(rgb_path), rgb_path

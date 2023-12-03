@@ -352,11 +352,11 @@ class GDRN_Online_DatasetFromList(Base_DatasetFromList):
         do_replace_bg = False
         if img_type == "syn":
             log_first_n(logging.WARNING, "replace bg", n=10)
-            do_replace_bg = True
+            do_replace_bg = False # Just don't replace bg for now
         else:  # real image
             if np.random.rand() < cfg.INPUT.CHANGE_BG_PROB:
                 log_first_n(logging.WARNING, "replace bg for real", n=10)
-                do_replace_bg = True
+                do_replace_bg = False
         if do_replace_bg:
             assert "segmentation" in dataset_dict["inst_infos"]
             mask = cocosegm2mask(dataset_dict["inst_infos"]["segmentation"], im_H_ori, im_W_ori)
@@ -517,7 +517,7 @@ class GDRN_Online_DatasetFromList(Base_DatasetFromList):
         if mask_trunc is None:
             mask_trunc = mask_visib
         else:
-            mask_trunc = mask_visib * mask_trunc.astype("float32")
+            mask_trunc = mask_visib * cv2.resize(mask_trunc, (640, 360)).astype("float32")
 
         if cfg.TRAIN.VIS:
             mask_xyz_interp = cv2.INTER_LINEAR
