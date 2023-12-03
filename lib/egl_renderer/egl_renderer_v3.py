@@ -72,7 +72,7 @@ class EGLRenderer(object):
         else:
             self.model_load_fn = load_mesh_sixd  # default using pysixd .ply loader
         self.use_cache = use_cache
-
+        #print(self.model_load_fn)
         if gpu_id is None:
             cuda_device_idx = torch.cuda.current_device()
         else:
@@ -560,7 +560,7 @@ class EGLRenderer(object):
                 obj_path,
                 vertex_scale=vertex_scale,
                 is_textured=is_textured,
-                use_cache=self.use_cache,
+                use_cache=False,#self.use_cache,
                 cad_model_color=cad_model_color,
             )
             is_cad = mesh["is_cad"]

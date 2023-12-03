@@ -403,6 +403,7 @@ def load_mesh_sixd(
     attributes = {}
     logger.info("loading {}".format(model_path))
     model = inout.load_ply(model_path)
+    print("in load_mesh_sixd, model.keys(): ", model.keys())
     vertices = np.array(model["pts"]).astype(np.float32) * vertex_scale
     # import pdb; pdb.set_trace();
     num_pts = vertices.shape[0]

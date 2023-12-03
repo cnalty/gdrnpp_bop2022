@@ -27,6 +27,7 @@ from core.gdrn_modeling.datasets import (
     itodd_pbr,
     itodd_bop_test,
     itodd_d2,
+    custom_train_isaac,
 )
 
 
@@ -58,6 +59,7 @@ _DSET_MOD_NAMES = [
     "itodd_pbr",
     "itodd_bop_test",
     "itodd_d2",
+    "custom_train_isaac"
 ]
 
 logger = logging.getLogger(__name__)
@@ -88,6 +90,7 @@ def register_datasets_in_cfg(cfg):
         "TRAIN_SYN_SUP",
     ]:
         for name in cfg.DATASETS.get(split, []):
+
             if name in DatasetCatalog.list():
                 continue
             registered = False
