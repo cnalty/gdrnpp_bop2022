@@ -25,11 +25,11 @@ model.head.num_classes = 21
 train.init_checkpoint = "pretrained_models/yolox/yolox_x.pth"
 
 # datasets
-DATASETS.TRAIN = ["ycbv_train_pbr"]
-DATASETS.TEST = ["ycbv_bop_test"]
+DATASETS.TRAIN = ["custom_train_isaac"]
+DATASETS.TEST = []
 
 dataloader.train.dataset.lst.names = DATASETS.TRAIN
-dataloader.train.total_batch_size = 32
+dataloader.train.total_batch_size = 8
 
 # color aug
 dataloader.train.aug_wrapper.COLOR_AUG_PROB = 0.8
