@@ -31,7 +31,7 @@ test_dir = osp.join(dataset_root, "test")
 test_scenes = [i for i in range(48, 59 + 1)]
 train_real_scenes = [i for i in range(0, 91 + 1) if i not in test_scenes]
 train_synt_scenes = [i for i in range(0, 79 + 1)]
-train_pbr_scenes = [0]
+train_pbr_scenes = [i for i in range(13)]
 
 model_dir = osp.join(dataset_root, "models")
 fine_model_dir = osp.join(dataset_root, "models_fine")
