@@ -29,8 +29,8 @@ classes = sorted(classes)
 # DEPTH_FACTOR = 1000.
 IM_H = 720
 IM_W = 1280
-near = 1. / 100.
-far = 1000000.0 / 100.
+near = 1. #/ 100.
+far = 1000000.0 #/ 100.
 
 data_dir = osp.normpath(osp.join(PROJ_ROOT, "datasets/BOP_DATASETS/synth_box_test/train_isaac/0"))
 

@@ -73,7 +73,8 @@ class GdrnPredictor():
         self.objs_dir = path_to_obj_models
 
         #set your trained object names
-        self.objs = {1: 'Master Chef Can',
+        self.objs = {1: "Box"}
+        """self.objs = {1: 'Master Chef Can',
                      2: 'Cracker Box',
                      3: 'Sugar Box',
                      4: 'Tomato Soup Can',
@@ -94,10 +95,10 @@ class GdrnPredictor():
                      19: 'Large Clamp',
                      20: 'Extra Large Clamp',
                      21: 'Foam Brick',
-                     }
+                     }"""
 
         self.cls_names = [i for i in self.objs.values()]
-        self.obj_ids = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21]
+        self.obj_ids = [1]#,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21]
         self.extents = self._get_extents()
 
         with open(camera_json_path) as f:
@@ -633,13 +634,17 @@ class GdrnPredictor():
 
             vis_dict[f"im_det_and_mask_full"] = img_vis_full_mask[:, :, ::-1]
         image_mask_pose_est = image
+
         for i in range(bs):
             R = batch["cur_res"][i]["R"]
             t = batch["cur_res"][i]["t"]
+            print(R)
+            print(t)
+            print("---------")
             # pose_est = np.hstack([R, t.reshape(3, 1)])
             curr_class = batch['roi_cls'][i].detach().cpu().item()
-            if curr_class not in [3, 17]:
-                continue
+            #if curr_class not in [3, 17]:
+            #    continue
             #print(curr_class)
             proj_pts_est = misc.project_pts(self.obj_models[curr_class + 1]["pts"], self.cam, R, t)
             mask_pose_est = misc.points2d_to_mask(proj_pts_est, im_H, im_W)

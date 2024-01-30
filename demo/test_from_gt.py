@@ -43,9 +43,9 @@ def gdrn_visualization(batch, image, obj_models, cam, save_path=None):
 
     for i in range(bs):
         R = np.array(batch[i]["cam_R_m2c"]).reshape(3, 3)
-        t = np.array(batch[i]["cam_t_m2c"]).reshape(-1, 1) #* 1000.
+        t = np.array(batch[i]["cam_t_m2c"]).reshape(-1, 1)
         #print(R)
-        #print(t)
+        print(t)
         print("---------")
         # pose_est = np.hstack([R, t.reshape(3, 1)])
         curr_class = batch[i]["obj_id"]
@@ -102,7 +102,7 @@ def main():
     }'''
     obj_models = get_models(osp.join(base_dir, "models"), objs)
 
-    camera_json_path = osp.join(base_dir, f"cam_osu_full.json")
+    camera_json_path = osp.join(base_dir + "_old", f"cam_osu_full.json")
 
     with open(camera_json_path) as f:
         camera_json = json.load(f)

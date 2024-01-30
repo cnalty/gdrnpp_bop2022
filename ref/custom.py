@@ -30,8 +30,8 @@ test_dir = osp.join(dataset_root, "test")
 
 test_scenes = [i for i in range(48, 59 + 1)]
 train_real_scenes = [i for i in range(0, 91 + 1) if i not in test_scenes]
-train_synt_scenes = [i for i in range(0, 79 + 1)]
-train_pbr_scenes = [0]
+train_synth_scenes = [i for i in range(0, 79 + 1)]
+train_pbr_scenes = [i for i in range(14)]
 
 model_dir = osp.join(dataset_root, "models")
 fine_model_dir = osp.join(dataset_root, "models_fine")
@@ -41,7 +41,7 @@ vertex_scale = 0.001
 
 # object info
 id2obj = {
-    0: "box"
+    1 : "box"
 }
 objects = list(id2obj.values())
 
@@ -53,17 +53,17 @@ texture_paths = [osp.join(model_dir, "obj_{:06d}.png".format(_id)) for _id in id
 model_colors = [((i + 1) * 10, (i + 1) * 10, (i + 1) * 10) for i in range(obj_num)]  # for renderer
 
 # yapf: disable
-diameters = np.array([601.2422971744351]) / 1000.0
+diameters = np.array([601.2422971744351]) #/ 1000.0
 # yapf: enable
 # Camera info
 width = 1280
 height = 720
-zNear = 0.25
-zFar = 6.
+zNear = 1. / 100.
+zFar = 1000000.0 / 100.
 center = (height / 2, width / 2)
 # default: synt
-camera_matrix = uw_camera_matrix = np.array([[642.218, 0.0, 640.],
-                                            [0, 641.508, 360],
+camera_matrix = uw_camera_matrix = np.array([[905, 0.0, 640.],
+                                            [0, 905, 360],
                                             [0, 0, 1]])
 
 depth_factor = 10000.0

@@ -53,7 +53,7 @@ class CUSTOM_TRAIN_ISAAC_Dataset:
         self.width = data_cfg["width"]  # 640
 
         self.cache_dir = data_cfg.get("cache_dir", osp.join(PROJ_ROOT, ".cache"))  # .cache
-        self.use_cache = data_cfg.get("use_cache", True)
+        self.use_cache = False #data_cfg.get("use_cache", True)
         self.num_to_load = data_cfg["num_to_load"]  # -1
         self.filter_invalid = data_cfg.get("filter_invalid", True)
         ##################################################
@@ -66,7 +66,7 @@ class CUSTOM_TRAIN_ISAAC_Dataset:
         self.obj2label = OrderedDict((obj, obj_id) for obj_id, obj in enumerate(self.objs))
         ##########################################################
 
-        self.scenes = ["{}".format(i) for i in range(1)]
+        self.scenes = ["{}".format(i) for i in range(15)]
 
     def __call__(self):
         """Load light-weight instance annotations of all images into a list of

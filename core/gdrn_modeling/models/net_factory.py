@@ -71,8 +71,8 @@ for backbone_name in [
 # "hrnet_w18_small", "hrnet_w18_small_v2", "hrnet_w18", "hrnet_w30", "hrnet_w32", "hrnet_w40", "hrnet_w44", "hrnet_w48", "hrnet_w64",
 # only get the models with pretrained models
 for backbone_name in timm.list_models(pretrained=True):
-    print(backbone_name)
-    print("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+    #print(backbone_name)
+    #print("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
     BACKBONES[f"timm/{backbone_name}"] = my_create_timm_model  # timm.create_model
 # yapf: enable
 

@@ -1,4 +1,6 @@
 import os.path as osp
+
+import cv2
 import torch
 import numpy as np
 import mmcv
@@ -104,6 +106,7 @@ def batch_data_train_online(cfg, data, renderer, device="cuda"):
     # get crop&resized K -------------------------------------------
     roi_crop_xy_batch = batch["roi_center"] - batch["roi_scale"].view(bs, -1) / 2
     out_res = net_cfg.OUTPUT_RES
+
     roi_resize_ratio_batch = out_res / batch["roi_scale"].view(bs, -1)
     batch["roi_zoom_K"] = get_K_crop_resize(batch["roi_cam"], roi_crop_xy_batch, roi_resize_ratio_batch)
     # --------------------------------------------------------------
@@ -139,6 +142,9 @@ def batch_data_train_online(cfg, data, renderer, device="cuda"):
                     batch["trans"][_i].detach().cpu().numpy().reshape(3, 1),
                 ]
             )
+            #print("pose: ",  pose)
+            #print("batch[roi_zoom_K]: ", batch["roi_zoom_K"][_i].detach().cpu().numpy())
+
             renderer.render(
                 [int(batch["roi_cls"][_i])],
                 [pose],
@@ -146,6 +152,9 @@ def batch_data_train_online(cfg, data, renderer, device="cuda"):
                 pc_cam_tensor=pc_cam_tensor,
             )
             roi_depth_batch[_i].copy_(pc_cam_tensor[:, :, 2], non_blocking=True)
+
+        #cv2.imshow("roi", batch['roi_img'][0].cpu().numpy().transpose(1,2,0))
+        #cv2.waitKey(0)
         roi_xyz_batch = misc.calc_xyz_bp_batch(
             roi_depth_batch,
             batch["ego_rot"],

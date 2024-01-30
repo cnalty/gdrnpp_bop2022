@@ -66,7 +66,7 @@ class CUSTOM_TRAIN_ISAAC_Dataset:
         self.obj2label = OrderedDict((obj, obj_id) for obj_id, obj in enumerate(self.objs))
         ##########################################################
 
-        self.scenes = ["0"]
+        self.scenes = [str(i) for i in range(14)]
 
     def __call__(self):
         """Load light-weight instance annotations of all images into a list of

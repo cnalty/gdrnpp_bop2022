@@ -174,37 +174,17 @@ if __name__ == "__main__":
     predictor = YoloPredictor(
                        exp_name="yolox-x",
                         config_file_path=osp.join(PROJ_ROOT, "configs/yolox/custom/yolox_x_640_augCozyAAEhsv_ranger_30_epochs_custom_test.py"),
-                        ckpt_file_path=osp.join(PROJ_ROOT, "pretrained_models/yolox/ycbv_pbr/model_final.pth"),
+                        ckpt_file_path="/home/chris/PycharmProjects/gdrnpp_bop2022/output/yolox/custom/yolox_x_640_augCozyAAEhsv_ranger_30_epochs_custom_test/last_mosaic_epoch15_iter4455.pth",
                        fuse=True,
                        fp16=False
                        )
-    for i in range(1,11):
-        img_path = osp.join(PROJ_ROOT,"/mnt/sdc1/3d_datasets/test_clips/ycb_objects/rgb/{:07d}.png".format(i))
+    for i in range(200,250):
+        img_path = osp.join(PROJ_ROOT,"/mnt/sdc1/3d_datasets/test_clips/treadmill_box1/rgb/{:07d}.png".format(i))
         img = cv2.imread(img_path)
         print(img.shape)
         img = cv2.resize(img, (640, 480))
         result = predictor.inference(img)
-        class_names = {1: 'Master Chef Can',
-                         2: 'Cracker Box',
-                         3: 'Sugar Box',
-                         4: 'Tomato Soup Can',
-                         5: 'Mustard Bottle',
-                         6: 'Tuna Fish Can',
-                         7: 'Pudding Box',
-                         8: 'Gelatin Box',
-                         9: 'Potted Meat Can',
-                         10: 'Banana',
-                         11: 'Pitcher Base',
-                         12: 'Bleach Cleanser',
-                         13: 'Bowl',
-                         14: 'Mug',
-                         15: 'Power Drill',
-                         16: 'Wood Block',
-                         17: 'Scissors',
-                         18: 'Large Marker',
-                         19: 'Large Clamp',
-                         20: 'Extra Large Clamp',
-                         21: 'Foam Brick',
+        class_names = {0: "box"
                          }
 
         predictor.visual_yolo(result[0], img, [class_names[i] for i in sorted(class_names.keys())])

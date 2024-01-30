@@ -1,12 +1,12 @@
 # about 3 days
 _base_ = ["../../_base_/gdrn_base.py"]
 
-OUTPUT_DIR = "output/gdrn/custom/convnext_a6_AugCosyAAEGray_BG05_mlL1_DMask_amodalClipBox_classAware_ycbv"
+OUTPUT_DIR = "output/gdrn/custom/convnext_a6_AugCosyAAEGray_BG05_mlL1_DMask_amodalClipBox_classAware_no_aug"
 INPUT = dict(
     DZI_PAD_SCALE=1.5,
     TRUNCATE_FG=True,
     CHANGE_BG_PROB=0.5,
-    COLOR_AUG_PROB=0.8,
+    COLOR_AUG_PROB=0,
     COLOR_AUG_TYPE="code",
     COLOR_AUG_CODE=(
         "Sequential(["
@@ -66,7 +66,7 @@ MODEL = dict(
     POSE_NET=dict(
         NAME="GDRN_double_mask",
         XYZ_ONLINE=True,
-        NUM_CLASSES=21,
+        NUM_CLASSES=1,
         BACKBONE=dict(
             FREEZE=False,
             PRETRAINED="timm",
