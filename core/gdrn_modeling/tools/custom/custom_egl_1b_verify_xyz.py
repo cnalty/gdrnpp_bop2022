@@ -21,21 +21,7 @@ from lib.utils.mask_utils import cocosegm2mask
 random.seed(2333)
 
 idx2class = {
-    1: "ape",
-    2: "benchvise",
-    3: "bowl",
-    4: "camera",
-    5: "can",
-    6: "cat",
-    7: "cup",
-    8: "driller",
-    9: "duck",
-    10: "eggbox",
-    11: "glue",
-    12: "holepuncher",
-    13: "iron",
-    14: "lamp",
-    15: "phone",
+    1: "box",
 }
 
 class2idx = {_name: _id for _id, _name in idx2class.items()}
@@ -44,24 +30,28 @@ classes = idx2class.values()
 classes = sorted(classes)
 
 # DEPTH_FACTOR = 1000.
-IM_H = 480
-IM_W = 640
+IM_H = 720
+IM_W = 1280
 near = 0.01
 far = 6.5
 
-data_dir = osp.normpath(osp.join(PROJ_ROOT, "datasets/BOP_DATASETS/lm/train_egl"))
+data_dir = osp.normpath(osp.join(PROJ_ROOT, "datasets/BOP_DATASETS/synth_box_test/train_isaac/0"))
 
 cls_indexes = [_idx for _idx in sorted(idx2class.keys())]
 cls_names = [idx2class[cls_idx] for cls_idx in cls_indexes]
-lm_model_dir = osp.normpath(osp.join(PROJ_ROOT, "datasets/BOP_DATASETS/lm/models"))
+lm_model_dir = osp.normpath(osp.join(PROJ_ROOT, "datasets/BOP_DATASETS/synth_box_test/models"))
 model_paths = [osp.join(lm_model_dir, f"obj_{cls_idx:06d}.ply") for cls_idx in cls_indexes]
 texture_paths = None
 
 xyz_root = osp.normpath(osp.join(data_dir, "xyz_crop"))
-gt_path = osp.join(data_dir, "gt.json")
+gt_path = osp.join(data_dir, "scene_gt.json")
 assert osp.exists(gt_path)
 
-K = np.array([[572.4114, 0, 325.2611], [0, 573.57043, 242.04899], [0, 0, 1]])
+K = np.array([
+        [640.0, 0.0, 640.],
+        [0, 576.12, 360],
+        [0, 0, 1]
+    ])
 DEPTH_FACTOR = 10000.0
 
 coord2d = get_2d_coord_np(width=IM_W, height=IM_H, fmt="HWC")
@@ -144,6 +134,7 @@ class XyzVerify(object):
             im_path = osp.join(data_dir, f"rgb/{int_im_id:06d}.jpg")
 
             for anno_i, anno in enumerate(annos):
+                print(anno.keys())
                 obj_id = anno["obj_id"]
                 pose = np.array(anno["pose"])
 

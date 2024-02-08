@@ -68,6 +68,7 @@ class CUSTOM_TRAIN_ISAAC_Dataset:
 
         self.scenes = ["{}".format(i) for i in range(13)]
 
+
     def __call__(self):
         """Load light-weight instance annotations of all images into a list of
         dicts in Detectron2 format.

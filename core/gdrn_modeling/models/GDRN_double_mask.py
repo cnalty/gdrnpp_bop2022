@@ -92,7 +92,7 @@ class GDRN_DoubleMask(nn.Module):
         net_cfg = cfg.MODEL.POSE_NET
         g_head_cfg = net_cfg.GEO_HEAD
         pnp_net_cfg = net_cfg.PNP_NET
-
+        #print(gt_xyz)
         device = x.device
         bs = x.shape[0]
         num_classes = net_cfg.NUM_CLASSES
@@ -404,6 +404,7 @@ class GDRN_DoubleMask(nn.Module):
             gt_mask_region = gt_masks[loss_cfg.REGION_LOSS_MASK_GT]
             if region_loss_type == "CE":
                 gt_region = gt_region.long()
+
                 loss_func = nn.CrossEntropyLoss(reduction="sum", weight=None)  # g_head_cfg.XYZ_BIN+1
                 loss_dict["loss_region"] = loss_func(
                     out_region * gt_mask_region[:, None], gt_region * gt_mask_region.long()

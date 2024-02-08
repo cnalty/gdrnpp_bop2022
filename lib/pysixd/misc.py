@@ -408,7 +408,7 @@ def calc_xyz_bp_torch(depth, R, T, K):
     xyz = torch.einsum("hwij,hwjk->hwi", Rinv_expand, xyz_cam - T_expand) * mask
     return xyz
 
-
+# Added printing here
 def calc_xyz_bp_batch(depth, R, T, K, fmt="BHWC"):
     """
     Args:
@@ -422,6 +422,10 @@ def calc_xyz_bp_batch(depth, R, T, K, fmt="BHWC"):
     import torch
 
     assert depth.ndim == 3, depth.shape
+    #print(torch.std_mean(depth))
+    #cv2.imshow("depth", depth[0].cpu().numpy())
+    #cv2.waitKey(0)
+    #print("depth: ", torch.std_mean(depth))
     bs, height, width = depth.shape
     grid_y, grid_x = torch.meshgrid(
         torch.arange(height, device=depth.device, dtype=depth.dtype),
@@ -461,6 +465,7 @@ def calc_xyz_bp_batch(depth, R, T, K, fmt="BHWC"):
         mask = (depth != 0).to(depth).view(bs, 1, height, width)
         xyz = torch.einsum("bijhw,bjkhw->bihw", Rinv_expand, xyz_cam - T_expand) * mask
 
+    #print("xyz: ", torch.std_mean(xyz))
     return xyz
 
 

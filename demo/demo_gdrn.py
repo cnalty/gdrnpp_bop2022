@@ -44,19 +44,19 @@ def get_image_list(rgb_images_path, depth_images_path=None):
 
 # Identified the problem. Appears to be using the index id as the class number instead of the actual class number.
 if __name__ == "__main__":
-    image_paths = get_image_list("/mnt/sdc1/3d_datasets/test_clips/ycb_objects/rgb", "/mnt/sdc1/3d_datasets/test_clips/ycb_objects/depth")
+    image_paths = get_image_list("/mnt/sdc1/3d_datasets/synth_box_test_old/train_isaac/0/rgb", None)
     yolo_predictor = YoloPredictor(
                        exp_name="yolox-x",
-                       config_file_path=osp.join(PROJ_ROOT,"configs/yolox/bop_pbr/yolox_x_640_augCozyAAEhsv_ranger_30_epochs_ycbv_pbr_ycbv_bop_test.py"),
-                       ckpt_file_path=osp.join(PROJ_ROOT,"pretrained_models/yolox/ycbv_pbr/model_final.pth"),
+                        config_file_path=osp.join(PROJ_ROOT, "configs/yolox/custom/yolox_x_640_augCozyAAEhsv_ranger_30_epochs_custom_test.py"),
+                        ckpt_file_path="/home/chris/PycharmProjects/gdrnpp_bop2022/output/yolox/custom/yolox_x_640_augCozyAAEhsv_ranger_30_epochs_custom_test/model_final.pth",
                        fuse=True,
                        fp16=False
-                     )
+                       )
     gdrn_predictor = GdrnPredictor(
-        config_file_path=osp.join(PROJ_ROOT,"configs/gdrn/ycbv/convnext_a6_AugCosyAAEGray_BG05_mlL1_DMask_amodalClipBox_classAware_ycbv.py"),
-        ckpt_file_path=osp.join(PROJ_ROOT,"pretrained_models/gdrnn/model_final_wo_optim.pth"),
-        camera_json_path="/mnt/sdc1/3d_datasets/test_clips/cam_osu.json",
-        path_to_obj_models=osp.join(PROJ_ROOT,"datasets/BOP_DATASETS/ycbv/models")
+        config_file_path=osp.join(PROJ_ROOT,"configs/gdrn/synth_box_test/convnext_small_a6_AugCosyAAEGray_BG05_mlL1_DMask_amodalClipBox_classAware_custom.py"),
+        ckpt_file_path=osp.join(PROJ_ROOT,"output/gdrnn/convnext_a6_AugCosyAAEGray_BG05_mlL1_DMask_amodalClipBox_classAware_possibly_fixed_minus_14_depth_factor_tenth/model_final.pth"),
+        camera_json_path="/mnt/sdc1/3d_datasets/synth_box_test_old/cam_osu.json",
+        path_to_obj_models=osp.join(PROJ_ROOT,"datasets/BOP_DATASETS/synth_box_test/models")
     )
     total_time = 0
     iterations = 0
@@ -79,7 +79,8 @@ if __name__ == "__main__":
         if iterations % 100 == 0:
             print("Average time taken so far: {} seconds".format(total_time / float(iterations)))
         gdrn_predictor.gdrn_visualization(batch=data_dict, out_dict=out_dict, image=rgb_img,
-                                          save_path=osp.join("/mnt/sdc1/3d_datasets/test_clips/ycb_objects/output", base_name))
+                                          save_path=osp.join("/mnt/sdc1/3d_datasets/synth_box_test/output_without_aug", base_name)
+                                          )
         #break
 
     print("Average time taken: {} seconds".format(total_time/float(iterations)))

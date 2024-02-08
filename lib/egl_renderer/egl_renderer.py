@@ -756,7 +756,12 @@ class EGLRenderer(object):
         P[2, 2] = (zfar + znear) / (zfar - znear)
         P[2, 3] = 1.0
         P[3, 2] = (2 * zfar * znear) / (znear - zfar)
+        print(P)
         self.P = P
+        """np.array([1.4149672116788357, 0.0, 0.0, 0.0,
+                            0.0, 2.5154972652068186, 0.0, 0.0,
+                            0.0, 0.0, 1.000001000001e-06, -1.0,
+                            0.0, 0.0, 1.000001000001, 0.0]).reshape(4, 4)"""
 
     def set_light_color(self, color):
         self.lightcolor = color
@@ -1545,32 +1550,22 @@ if __name__ == "__main__":
     # test_ycb_render()
     # exit(0)
 
-    width = 640
-    height = 480
-    znear = 0.25
-    zfar = 6.0
-    K = np.array([[572.4114, 0, 325.2611], [0, 573.57043, 242.04899], [0, 0, 1]])
+    width = 1280
+    height = 720
+    znear = 1. / 100
+    zfar = 1000000.0 / 100
+    K = np.array([
+        [640.0, 0.0, 640.],
+        [0, 576.12, 360],
+        [0, 0, 1]
+    ])
     idx2class = {
-        1: "ape",
-        2: "benchvise",
-        3: "bowl",
-        4: "camera",
-        5: "can",
-        6: "cat",
-        7: "cup",
-        8: "driller",
-        9: "duck",
-        10: "eggbox",
-        11: "glue",
-        12: "holepuncher",
-        13: "iron",
-        14: "lamp",
-        15: "phone",
+        0 : "box"
     }
     classes = idx2class.values()
     classes = sorted(classes)
 
-    model_root = "datasets/BOP_DATASETS/lm/models/"
+    model_root = "datasets/BOP_DATASETS/synth_box_test/models/"
     model_paths = [osp.join(model_root, "obj_{:06d}.ply".format(cls_idx)) for cls_idx in idx2class]
     models = [inout.load_ply(model_path, vertex_scale=0.001) for model_path in model_paths]
     extents = [get_vertices_extent(model["pts"]) for model in models]
@@ -1578,6 +1573,7 @@ if __name__ == "__main__":
     renderer = EGLRenderer(
         model_paths,
         K,
+        robot="",
         width=width,
         height=height,
         render_marker=False,
@@ -1604,7 +1600,7 @@ if __name__ == "__main__":
     pose4 = np.hstack([R, t.reshape((3, 1)) + 0.05])
     # renderer.set_poses([pose])
 
-    bg_images = glob.glob("datasets/coco/train2017/*.jpg")
+    bg_images = glob.glob("datasets/VOC2012/JPEGImages/*.jpg")
     num_bg_imgs = len(bg_images)
 
     # rendering
@@ -1670,7 +1666,7 @@ if __name__ == "__main__":
             t_render += time.perf_counter() - t0
             runs += 1
             # torch.save(im, 'im_{}.pth'.format(cls_name))
-            if False:
+            if True:
                 im = (im.cpu().numpy() + 0.5).astype(np.uint8)  # bgr
                 seg = (seg_tensor[:, :, 0].cpu().numpy() * 255 + 0.5).astype(np.uint8)
                 masks = [

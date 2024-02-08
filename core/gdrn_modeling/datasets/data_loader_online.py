@@ -389,6 +389,7 @@ class GDRN_Online_DatasetFromList(Base_DatasetFromList):
         image, transforms = T.apply_augmentations(self.augmentation, image)
         im_H, im_W = image_shape = image.shape[:2]  # h, w
 
+
         # NOTE: scale camera intrinsic if necessary ================================
         # TODO: resize depth and mask if necessary ================================
         scale_x = im_W / im_W_ori
@@ -478,15 +479,21 @@ class GDRN_Online_DatasetFromList(Base_DatasetFromList):
             raise ValueError
 
         bbox_center, scale = self.aug_bbox_DZI(cfg, bbox_xyxy, im_H, im_W)
+
         bw = max(bbox_xyxy[2] - bbox_xyxy[0], 1)
         bh = max(bbox_xyxy[3] - bbox_xyxy[1], 1)
-
+        #cv2.imshow("img", image)
+        #cv2.waitKey(0)
         # CHW, float32 tensor
         ## roi_image ------------------------------------
         roi_img = crop_resize_by_warp_affine(
             image, bbox_center, scale, input_res, interpolation=cv2.INTER_LINEAR
-        ).transpose(2, 0, 1)
+        )#.transpose(2, 0, 1)
 
+        # Added for debugging
+        #cv2.imshow("roi", roi_img)
+        #cv2.waitKey(0)
+        roi_img = roi_img.transpose(2, 0, 1)
         roi_img = self.normalize_image(cfg, roi_img)
 
         # roi_depth --------------------------------------
