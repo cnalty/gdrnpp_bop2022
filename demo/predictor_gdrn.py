@@ -32,6 +32,8 @@ from types import SimpleNamespace
 from setproctitle import setproctitle
 from mmcv import Config
 
+from scipy.spatial.transform import Rotation as spR
+
 from core.gdrn_modeling.models import (
     GDRN,
     GDRN_no_region,
@@ -46,7 +48,8 @@ class GdrnPredictor():
                  config_file_path=osp.join(PROJ_ROOT,"configs/gdrn/lmo_pbr/convnext_a6_AugCosyAAEGray_BG05_mlL1_DMask_amodalClipBox_classAware_lmo.py"),
                  ckpt_file_path=osp.join(PROJ_ROOT,"output/gdrn/lmo_pbr/convnext_a6_AugCosyAAEGray_BG05_mlL1_DMask_amodalClipBox_classAware_lmo/model_final.pth"),
                  camera_json_path=osp.join(PROJ_ROOT,"datasets/BOP_DATASETS/lmo/camera.json"),
-                 path_to_obj_models=osp.join(PROJ_ROOT,"datasets/BOP_DATASETS/lmo/models")
+                 path_to_obj_models=osp.join(PROJ_ROOT,"datasets/BOP_DATASETS/lmo/models"),
+                 device="cuda"
                  ):
 
         self.args = SimpleNamespace(config_file=config_file_path,
@@ -71,7 +74,7 @@ class GdrnPredictor():
 
         self.cfg = self.setup(self.args)
         self.objs_dir = path_to_obj_models
-
+        self.device=device
         #set your trained object names
         self.objs = {1: "Box"}
         """self.objs = {1: 'Master Chef Can',
@@ -149,10 +152,11 @@ class GdrnPredictor():
         Returns:
             dict: output of the model
         """
+        self.model.to(self.device)
         with inference_context(self.model), torch.no_grad():
             with autocast(enabled=False):  # gdrn amp_test seems slower
                 out_dict = self.model(
-                    data_dict["roi_img"],
+                    data_dict["roi_img"].to(self.device),
                     roi_classes=data_dict["roi_cls"],
                     roi_cams=data_dict["roi_cam"],
                     roi_whs=data_dict["roi_wh"],
@@ -336,17 +340,20 @@ class GdrnPredictor():
             "annotations": []
         }
 
-        if outputs is None:
+        if outputs is None or outputs[0] is None:
             # TODO set default output
+            print("AHHHHHHHHHHHHHHHHHH")
             return None
-        boxes = outputs[0].cpu()
 
+        #print(outputs)
+        boxes = outputs[0].cpu()
+        #print("---")
         for i in range(len(boxes)):
             annot_inst = {}
             box = boxes[i].tolist()
             annot_inst["category_id"] = int(box[6])
             annot_inst["score"] = box[4] * box[5]
-            annot_inst["bbox_est"] = [box[0], box[1], box[2], box[3]]
+            annot_inst["bbox_est"] = [box[0], box[1], box[2], box[3]] #[425., 0., 618., 165.] #
             annot_inst["bbox_mode"] = BoxMode.XYXY_ABS
 
             dataset_dict["annotations"].append(annot_inst)
@@ -488,11 +495,11 @@ class GdrnPredictor():
             else:
                 dtype = torch.float32
             if key in dataset_dict:
-                batch[key] = torch.cat([dataset_dict[key]], dim=0).to(device='cuda', dtype=dtype, non_blocking=True)
+                batch[key] = torch.cat([dataset_dict[key]], dim=0).to(device=self.device, dtype=dtype, non_blocking=True)
 
-        batch["roi_cam"] = torch.cat([dataset_dict["cam"]], dim=0).to('cuda', non_blocking=True)
-        batch["roi_center"] = torch.cat([dataset_dict["bbox_center"]], dim=0).to('cuda', non_blocking=True)
-        batch["bbox_center"] = torch.cat([dataset_dict["bbox_center"]], dim=0).to('cuda', non_blocking=True)#roi_infos["bbox_center"]
+        batch["roi_cam"] = torch.cat([dataset_dict["cam"]], dim=0).to(self.device, non_blocking=True)
+        batch["roi_center"] = torch.cat([dataset_dict["bbox_center"]], dim=0).to(self.device, non_blocking=True)
+        batch["bbox_center"] = torch.cat([dataset_dict["bbox_center"]], dim=0).to(self.device, non_blocking=True)#roi_infos["bbox_center"]
         batch["cam"] = dataset_dict["cam"]
 
         return batch
@@ -607,7 +614,7 @@ class GdrnPredictor():
 
         # for crop and resize
         bs = batch["roi_cls"].shape[0]
-        tensor_kwargs = {"dtype": torch.float32, "device": "cuda"}
+        tensor_kwargs = {"dtype": torch.float32, "device": self.device}
         rois_xy0 = batch["roi_center"] - batch["scale"].view(bs, -1) / 2  # bx2
         rois_xy1 = batch["roi_center"] + batch["scale"].view(bs, -1) / 2  # bx2
         batch["inst_rois"] = torch.cat([torch.arange(bs, **tensor_kwargs).view(-1, 1), rois_xy0, rois_xy1], dim=1)
@@ -638,21 +645,26 @@ class GdrnPredictor():
         for i in range(bs):
             R = batch["cur_res"][i]["R"]
             t = batch["cur_res"][i]["t"]
-            print(R)
-            print(t)
-            print("---------")
+
+            eulers = spR.from_matrix(R).as_euler("xyz", degrees=True)
+
+            rotation_label = f" R: {eulers[0]:.2f}, {eulers[1]:.2f}, {eulers[2]:.2f}"
+            translation_label = f" t: {t[0]:.2f}, {t[1]:.2f}, {t[2]:.2f}"
+            #print(R)
+            #print(t)
+            #print("---------")
             # pose_est = np.hstack([R, t.reshape(3, 1)])
             curr_class = batch['roi_cls'][i].detach().cpu().item()
             #if curr_class not in [3, 17]:
             #    continue
             #print(curr_class)
             proj_pts_est = misc.project_pts(self.obj_models[curr_class + 1]["pts"], self.cam, R, t)
-            mask_pose_est = misc.points2d_to_mask(proj_pts_est, im_H, im_W)
-            image_mask_pose_est = vis_image_mask_cv2(image, mask_pose_est, color="yellow" if i == 0 else "blue")
+            mask_pose_est = misc.points2d_to_mask_big(proj_pts_est, im_H, im_W)
+            image_mask_pose_est = vis_image_mask_cv2(image, mask_pose_est, color="yellow" if i == 0 else "red")
             image_mask_pose_est = vis_image_bboxes_cv2(
                 image_mask_pose_est,
                 [batch["bbox_est"][i].detach().cpu().numpy()],
-                labels=[self.cls_names[curr_class]]
+                labels=[self.cls_names[curr_class] + rotation_label + translation_label],
             )
             #vis_dict[f"im_{i}_mask_pose_est"] = image_mask_pose_est[:, :, ::-1]
         #show_ims = np.hstack([cv2.cvtColor(_v, cv2.COLOR_BGR2RGB) for _k, _v in vis_dict.items()])

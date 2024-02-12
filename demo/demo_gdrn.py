@@ -44,23 +44,25 @@ def get_image_list(rgb_images_path, depth_images_path=None):
 
 # Identified the problem. Appears to be using the index id as the class number instead of the actual class number.
 if __name__ == "__main__":
-    image_paths = get_image_list("/mnt/sdc1/3d_datasets/synth_box_test_old/train_isaac/0/rgb", None)
+    image_paths = get_image_list("/home/chris/PycharmProjects/realsense/camera_data/rgb/data_08_02_2024_11_24_28", None)
     yolo_predictor = YoloPredictor(
                        exp_name="yolox-x",
                         config_file_path=osp.join(PROJ_ROOT, "configs/yolox/custom/yolox_x_640_augCozyAAEhsv_ranger_30_epochs_custom_test.py"),
-                        ckpt_file_path="/home/chris/PycharmProjects/gdrnpp_bop2022/output/yolox/custom/yolox_x_640_augCozyAAEhsv_ranger_30_epochs_custom_test/model_final.pth",
+                        ckpt_file_path="/home/chris/PycharmProjects/gdrnpp_bop2022/output/yolox/custom/yolox_x_640_augCozyAAEhsv_ranger_30_epochs_custom_test/model_0036147.pth",
                        fuse=True,
                        fp16=False
                        )
     gdrn_predictor = GdrnPredictor(
-        config_file_path=osp.join(PROJ_ROOT,"configs/gdrn/synth_box_test/convnext_small_a6_AugCosyAAEGray_BG05_mlL1_DMask_amodalClipBox_classAware_custom.py"),
-        ckpt_file_path=osp.join(PROJ_ROOT,"output/gdrnn/convnext_a6_AugCosyAAEGray_BG05_mlL1_DMask_amodalClipBox_classAware_possibly_fixed_minus_14_depth_factor_tenth/model_final.pth"),
-        camera_json_path="/mnt/sdc1/3d_datasets/synth_box_test_old/cam_osu.json",
-        path_to_obj_models=osp.join(PROJ_ROOT,"datasets/BOP_DATASETS/synth_box_test/models")
+        config_file_path=osp.join(PROJ_ROOT,"output/lambda_logs/gdrn/custom/convnext_a6_AugCosyAAEGray_BG05_mlL1_DMask_amodalClipBox_classAware_full_aug_synth_3/convnext_a6_AugCosyAAEGray_BG05_mlL1_DMask_amodalClipBox_classAware_custom.py"),
+        ckpt_file_path=osp.join(PROJ_ROOT,"output/lambda_logs/gdrn/custom/convnext_a6_AugCosyAAEGray_BG05_mlL1_DMask_amodalClipBox_classAware_full_aug_synth_3/model_final.pth"),
+        camera_json_path="/home/chris/datasets/synth_box_test/cam_osu.json",
+        path_to_obj_models="/home/chris/datasets/synth_box_2/models",
+        #device="cpu"
     )
     total_time = 0
     iterations = 0
-
+    save_path = "/home/chris/datasets/manual_bbox_output/box_all_instance_45conf_earlymodel_tinynms/{}"
+    os.makedirs(osp.dirname(save_path), exist_ok=True)
     for rgb_img, depth_img in image_paths:
         base_name = osp.basename(rgb_img)
         rgb_img = cv2.imread(rgb_img)
@@ -73,13 +75,16 @@ if __name__ == "__main__":
         data_dict = gdrn_predictor.preprocessing(outputs=outputs, image=rgb_img, depth_img=None)
         out_dict = gdrn_predictor.inference(data_dict)
         poses = gdrn_predictor.postprocessing(data_dict, out_dict)
+        print(poses)
         end_time = time.time()
         total_time += end_time - start_time
         iterations += 1
+
+
         if iterations % 100 == 0:
             print("Average time taken so far: {} seconds".format(total_time / float(iterations)))
         gdrn_predictor.gdrn_visualization(batch=data_dict, out_dict=out_dict, image=rgb_img,
-                                          save_path=osp.join("/mnt/sdc1/3d_datasets/synth_box_test/output_without_aug", base_name)
+                                          save_path=save_path.format(base_name)
                                           )
         #break
 

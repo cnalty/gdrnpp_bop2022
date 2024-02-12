@@ -113,6 +113,9 @@ class YoloPredictor():
                             instance_detections[class_num] = detection
                             max_conf = detection[4] * detection[5]
                 detections = instance_detections
+            else:
+                if detections.size(0) == 0:
+                    detections = torch.rand(num_classes, 7)
             if not detections.size(0):
                 # logger.warn(f"detections.size(0) {detections.size(0)} num_classes: {num_classes} conf_thr: {conf_thre} nms_thr: {nms_thre}")
                 continue
@@ -166,7 +169,7 @@ class YoloPredictor():
                                   self.cfg.conf_thr,
                                   self.cfg.nms_thr,
                                   class_agnostic=True,
-                                  keep_single_instance=True)
+                                  keep_single_instance=False)
 
         return outputs
 

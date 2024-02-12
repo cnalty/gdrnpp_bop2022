@@ -555,6 +555,18 @@ def points2d_to_mask(points2d, height=480, width=640):
             mask[y, x] = 1
     return mask
 
+def points2d_to_mask_big(points2d, height=480, width=640, point_size=3):
+    # point_size: radius of the circle or half-length of the square around each point
+    mask = np.zeros((height, width), dtype=np.uint8)
+    for x, y in points2d:
+        x = int(round(x))
+        y = int(round(y))
+        if x >= 0 and x < width and y >= 0 and y < height:
+            # Draw a circle around the point
+            cv2.circle(mask, (x, y), point_size, color=1, thickness=-1)
+            # Or draw a square around the point
+            # cv2.rectangle(mask, (x - point_size, y - point_size), (x + point_size, y + point_size), color=1, thickness=-1)
+    return mask
 
 def project_model(model, pose, K):
     """
