@@ -33,6 +33,7 @@ from setproctitle import setproctitle
 from mmcv import Config
 
 from scipy.spatial.transform import Rotation as spR
+from collections import defaultdict
 
 from core.gdrn_modeling.models import (
     GDRN,
@@ -207,12 +208,12 @@ class GdrnPredictor():
         if self.cfg.TEST.USE_DEPTH_REFINE:
             self.process_depth_refine(data_dict, out_dict)
 
-        poses = {}
+        poses = defaultdict(list)
         for res in data_dict["cur_res"]:
             pose = np.eye(4)
             pose[:3, :3] = res['R']
             pose[:3, 3] = res['t']
-            poses[self.objs.get(res['obj_id'])] = pose
+            poses[self.objs.get(res['obj_id'])].append(pose)
 
         return poses
 
@@ -645,6 +646,8 @@ class GdrnPredictor():
         for i in range(bs):
             R = batch["cur_res"][i]["R"]
             t = batch["cur_res"][i]["t"]
+            if t[-1] > 2.0:
+                continue
 
             eulers = spR.from_matrix(R).as_euler("xyz", degrees=True)
 

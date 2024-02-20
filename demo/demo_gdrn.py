@@ -61,7 +61,7 @@ if __name__ == "__main__":
     )
     total_time = 0
     iterations = 0
-    save_path = "/home/chris/datasets/manual_bbox_output/box_all_instance_45conf_earlymodel_tinynms/{}"
+    save_path = "/home/chris/datasets/manual_bbox_output/box_all_instance_35conf_earlymodel_tinynms_distance2/{}"
     os.makedirs(osp.dirname(save_path), exist_ok=True)
     for rgb_img, depth_img in image_paths:
         base_name = osp.basename(rgb_img)
@@ -76,6 +76,7 @@ if __name__ == "__main__":
         out_dict = gdrn_predictor.inference(data_dict)
         poses = gdrn_predictor.postprocessing(data_dict, out_dict)
         print(poses)
+        print("----------------------------------")
         end_time = time.time()
         total_time += end_time - start_time
         iterations += 1
