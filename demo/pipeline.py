@@ -81,11 +81,7 @@ class Pipeline():
 
     def change_basis(self, original_matrix):
         # Basis change matrix
-        basis_change = np.array([
-            [0, -1, 0],  # New x-axis (original z-axis)
-            [0, 0, -1],  # New y-axis (original -x-axis)
-            [1, 0, 0]  # New z-axis (original -y-axis)
-        ])
+        basis_change = spR.from_euler('xyz', (-90, 0, -90), degrees=True).as_matrix()
         #basis_change = np.linalg.inv(basis_change)
         # Apply the basis change
         new_matrix = basis_change.T @ original_matrix @ np.linalg.inv(basis_change.T)
