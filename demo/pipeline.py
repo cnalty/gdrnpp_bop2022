@@ -82,12 +82,13 @@ class Pipeline():
     def change_basis(self, original_matrix):
         # Basis change matrix
         basis_change = np.array([
-            [0, 0, 1],  # New x-axis (original z-axis)
-            [-1, 0, 0],  # New y-axis (original -x-axis)
-            [0, -1, 0]  # New z-axis (original -y-axis)
+            [0, -1, 0],  # New x-axis (original z-axis)
+            [0, 0, -1],  # New y-axis (original -x-axis)
+            [1, 0, 0]  # New z-axis (original -y-axis)
         ])
+        #basis_change = np.linalg.inv(basis_change)
         # Apply the basis change
-        new_matrix = basis_change @ original_matrix @ np.linalg.inv(basis_change)
+        new_matrix = basis_change.T @ original_matrix @ np.linalg.inv(basis_change.T)
         return new_matrix
 
 
@@ -116,6 +117,7 @@ if __name__ == "__main__":
     print(rotation_label)
     changed_rotation = pipeline.change_basis(R)
 
+    # Should be x forward (out of camera), y left, z up
     eulers = spR.from_matrix(changed_rotation).as_euler("xyz", degrees=True)
     rotation_label = f"R changed: {eulers[0]:.2f}, {eulers[1]:.2f}, {eulers[2]:.2f}"
     print(rotation_label)
@@ -123,5 +125,5 @@ if __name__ == "__main__":
     proj_pts_est = misc.project_pts(pipeline.gdrn_predictor.obj_models[1]["pts"], pipeline.gdrn_predictor.cam, R, t)
     mask_pose_est = misc.points2d_to_mask_big(proj_pts_est, 480, 640)
     image_mask_pose_est = vis_image_mask_cv2(images[6], mask_pose_est, color="yellow" if i == 0 else "red")
-    cv2.imshow("blah", image_mask_pose_est)
-    cv2.waitKey(0)
+    #cv2.imshow("blah", image_mask_pose_est)
+    #cv2.waitKey(0)
